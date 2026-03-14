@@ -1,0 +1,419 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Ticket Manager · Vinternship</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;600;700&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg:#07070f; --s1:#10101c; --s2:#181827; --s3:#1e1e30;
+  --border:rgba(255,255,255,0.07); --text:#eeeeff; --muted:#7777aa;
+  --gold:#ffd700; --silver:#c0c8d8; --bronze:#cd7f32;
+  --font:'Inter',sans-serif; --mono:'JetBrains Mono',monospace;
+  --radius:12px;
+}
+*{margin:0;padding:0;box-sizing:border-box;}
+body{background:var(--bg);color:var(--text);font-family:var(--font);min-height:100vh;}
+body::before{content:'';position:fixed;inset:0;pointer-events:none;
+  background:radial-gradient(ellipse at 20% 0%,rgba(255,215,0,0.05) 0%,transparent 50%),
+             radial-gradient(ellipse at 80% 0%,rgba(77,150,255,0.05) 0%,transparent 50%);}
+
+/* ── HEADER ── */
+header{
+  padding:18px 40px; display:flex; align-items:center; justify-content:space-between;
+  background:rgba(16,16,28,0.9); backdrop-filter:blur(16px);
+  border-bottom:1px solid var(--border); position:sticky; top:0; z-index:100;
+}
+.logo{display:flex;align-items:center;gap:12px;}
+.logo-mark{width:40px;height:40px;border-radius:11px;background:linear-gradient(135deg,#ffd700,#ff9500);
+  display:flex;align-items:center;justify-content:center;font-size:20px;}
+.logo h1{font-size:17px;font-weight:800;letter-spacing:-.3px;}
+.logo p{font-size:11px;color:var(--muted);margin-top:1px;}
+.hbtns{display:flex;gap:10px;align-items:center;}
+.btn{padding:8px 18px;border-radius:9px;font-family:var(--font);font-size:13px;font-weight:600;
+  cursor:pointer;border:none;transition:all .2s;}
+.btn-primary{background:linear-gradient(135deg,#ffd700,#ff9500);color:#000;}
+.btn-primary:hover{opacity:.9;transform:translateY(-1px);}
+.btn-ghost{background:var(--s2);border:1px solid var(--border);color:var(--muted);}
+.btn-ghost:hover{color:var(--text);}
+
+/* ── MAIN ── */
+.wrap{max-width:1200px;margin:0 auto;padding:32px 40px 80px;position:relative;z-index:1;}
+
+/* ── AUTH GATE ── */
+.auth-gate{
+  max-width:420px;margin:80px auto;background:var(--s1);
+  border:1px solid var(--border);border-radius:20px;padding:36px;text-align:center;
+}
+.auth-icon{font-size:48px;margin-bottom:16px;}
+.auth-gate h2{font-size:22px;font-weight:800;margin-bottom:8px;}
+.auth-gate p{color:var(--muted);font-size:14px;margin-bottom:24px;line-height:1.6;}
+.field{margin-bottom:16px;text-align:left;}
+.field label{display:block;font-size:11px;font-weight:600;color:var(--muted);
+  text-transform:uppercase;letter-spacing:.8px;margin-bottom:6px;}
+.field input,.field select{
+  width:100%;background:var(--s2);border:1px solid var(--border);border-radius:9px;
+  padding:10px 14px;color:var(--text);font-family:var(--font);font-size:14px;outline:none;
+  transition:border-color .2s;
+}
+.field input:focus,.field select:focus{border-color:#ffd700;}
+.field input::placeholder{color:var(--muted);}
+.status{font-size:13px;padding:8px 14px;border-radius:8px;margin-top:12px;display:none;}
+.status.ok {background:rgba(107,203,119,.15);color:#6bcb77;border:1px solid rgba(107,203,119,.3);display:block;}
+.status.err{background:rgba(255,107,107,.15);color:#ff6b6b;border:1px solid rgba(255,107,107,.3);display:block;}
+
+/* ── COHORT SELECTOR ── */
+.cohort-bar{display:flex;gap:10px;margin-bottom:28px;flex-wrap:wrap;align-items:center;}
+.cohort-tab{
+  padding:8px 18px;border-radius:20px;font-size:13px;font-weight:600;cursor:pointer;
+  background:var(--s2);border:1px solid var(--border);color:var(--muted);transition:all .2s;
+}
+.cohort-tab:hover{color:var(--text);}
+.cohort-tab.active{color:#000;font-weight:700;}
+
+/* ── STATS STRIP ── */
+.stats-strip{display:flex;gap:14px;margin-bottom:24px;flex-wrap:wrap;}
+.stat-pill{
+  background:var(--s1);border:1px solid var(--border);border-radius:10px;
+  padding:10px 18px;display:flex;align-items:center;gap:10px;
+}
+.stat-pill span{font-family:var(--mono);font-size:18px;font-weight:700;}
+.stat-pill label{font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:.6px;}
+
+/* ── TOOLBAR ── */
+.toolbar{display:flex;gap:12px;margin-bottom:20px;flex-wrap:wrap;align-items:center;}
+.search-box{
+  flex:1;min-width:220px;background:var(--s2);border:1px solid var(--border);border-radius:9px;
+  padding:9px 14px 9px 36px;color:var(--text);font-family:var(--font);font-size:14px;outline:none;
+  transition:border-color .2s;
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' fill='%237777aa' viewBox='0 0 16 16'%3E%3Cpath d='M11.742 10.344a6.5 6.5 0 1 0-1.397 1.398l3.85 3.85a1 1 0 0 0 1.415-1.415l-3.868-3.833zm-5.242 1.156a5 5 0 1 1 0-10 5 5 0 0 1 0 10z'/%3E%3C/svg%3E");
+  background-repeat:no-repeat;background-position:12px center;
+}
+.search-box:focus{border-color:#ffd700;}
+.filter-sel{
+  background:var(--s2);border:1px solid var(--border);border-radius:9px;
+  padding:9px 14px;color:var(--text);font-family:var(--font);font-size:13px;outline:none;cursor:pointer;
+}
+.save-banner{
+  padding:10px 18px;border-radius:9px;font-size:13px;font-weight:600;
+  background:rgba(107,203,119,.15);color:#6bcb77;border:1px solid rgba(107,203,119,.3);
+  display:none;animation:fadeIn .3s;
+}
+@keyframes fadeIn{from{opacity:0}to{opacity:1}}
+
+/* ── STUDENT TABLE ── */
+.table-wrap{background:var(--s1);border:1px solid var(--border);border-radius:var(--radius);overflow:hidden;}
+.tbl{width:100%;border-collapse:collapse;}
+.tbl th{
+  padding:12px 16px;text-align:left;font-size:11px;font-weight:700;color:var(--muted);
+  text-transform:uppercase;letter-spacing:.8px;background:var(--s2);
+  border-bottom:1px solid var(--border);
+}
+.tbl td{padding:11px 16px;border-bottom:1px solid rgba(255,255,255,0.04);vertical-align:middle;}
+.tbl tr:last-child td{border-bottom:none;}
+.tbl tr:hover td{background:rgba(255,255,255,0.02);}
+.rank-badge{
+  width:28px;height:28px;border-radius:7px;display:inline-flex;align-items:center;justify-content:center;
+  font-family:var(--mono);font-size:12px;font-weight:700;background:var(--s3);color:var(--muted);
+}
+.rank-badge.r1{background:linear-gradient(135deg,#ffd700,#ff9500);color:#000;}
+.rank-badge.r2{background:linear-gradient(135deg,#c0c8d8,#8899aa);color:#000;}
+.rank-badge.r3{background:linear-gradient(135deg,#cd7f32,#8b5030);color:#fff;}
+.sname{font-weight:600;font-size:13px;}
+.semail{font-size:11px;color:var(--muted);margin-top:2px;}
+.stat-val{font-family:var(--mono);font-size:13px;font-weight:600;}
+.ticket-sel{
+  background:var(--s2);border:1px solid var(--border);border-radius:7px;
+  padding:6px 10px;color:var(--text);font-family:var(--font);font-size:12px;
+  font-weight:600;outline:none;cursor:pointer;transition:all .2s;min-width:90px;
+}
+.ticket-sel:focus{border-color:#ffd700;}
+.ticket-sel.gold  {background:rgba(255,215,0,.15);  border-color:rgba(255,215,0,.4);  color:var(--gold);}
+.ticket-sel.silver{background:rgba(192,200,216,.15);border-color:rgba(192,200,216,.4);color:var(--silver);}
+.ticket-sel.bronze{background:rgba(205,127,50,.15); border-color:rgba(205,127,50,.4); color:var(--bronze);}
+.msg-input{
+  background:var(--s2);border:1px solid var(--border);border-radius:7px;
+  padding:6px 10px;color:var(--text);font-family:var(--font);font-size:12px;
+  outline:none;width:180px;transition:border-color .2s;
+}
+.msg-input:focus{border-color:#4d96ff;}
+.msg-input::placeholder{color:var(--muted);}
+.save-btn{
+  padding:5px 12px;border-radius:6px;border:1px solid var(--border);
+  background:var(--s3);color:var(--muted);font-size:11px;font-weight:600;cursor:pointer;
+  transition:all .2s;
+}
+.save-btn:hover{border-color:#4d96ff;color:#4d96ff;}
+.save-btn.saved{border-color:#6bcb77;color:#6bcb77;background:rgba(107,203,119,.1);}
+.empty-row td{text-align:center;padding:40px;color:var(--muted);font-size:14px;}
+
+/* ── LOADER ── */
+.loader{text-align:center;padding:60px 20px;}
+.spinner{width:36px;height:36px;border:3px solid var(--border);border-top-color:#ffd700;
+  border-radius:50%;animation:spin .8s linear infinite;margin:0 auto 14px;}
+@keyframes spin{to{transform:rotate(360deg)}}
+</style>
+</head>
+<body>
+<header>
+  <div class="logo">
+    <div class="logo-mark">🎫</div>
+    <div>
+      <h1>Ticket Manager</h1>
+      <p>Assign Gold · Silver · Bronze + Personal Messages</p>
+    </div>
+  </div>
+  <div class="hbtns">
+    <a href="index.html"><button class="btn btn-ghost">← Dashboard</button></a>
+    <a href="student.html"><button class="btn btn-ghost">🎓 Student View</button></a>
+  </div>
+</header>
+
+<div class="wrap">
+  <!-- Auth Gate -->
+  <div id="authGate" class="auth-gate">
+    <div class="auth-icon">🔐</div>
+    <h2>Teacher Login</h2>
+    <p>Enter your admin key to manage tickets and messages for students.</p>
+    <div class="field">
+      <label>Admin Key</label>
+      <input type="password" id="keyInput" placeholder="Enter admin key…" onkeydown="if(event.key==='Enter')login()">
+    </div>
+    <button class="btn btn-primary" style="width:100%;padding:11px" onclick="login()">Unlock →</button>
+    <div class="status" id="authStatus"></div>
+  </div>
+
+  <!-- Main Panel (hidden until auth) -->
+  <div id="mainPanel" style="display:none">
+
+    <!-- Cohort tabs -->
+    <div class="field" style="margin-bottom:20px;max-width:300px">
+      <label>Select Cohort</label>
+      <select id="cohortSel" class="filter-sel" style="width:100%" onchange="loadCohort(this.value)">
+        <option value="">— choose a cohort —</option>
+      </select>
+    </div>
+
+    <!-- Stats strip -->
+    <div class="stats-strip" id="statsStrip" style="display:none">
+      <div class="stat-pill">
+        <span id="st-total" style="color:#4d96ff">0</span>
+        <label>Total</label>
+      </div>
+      <div class="stat-pill">
+        <span id="st-gold" style="color:var(--gold)">0</span>
+        <label>🥇 Gold</label>
+      </div>
+      <div class="stat-pill">
+        <span id="st-silver" style="color:var(--silver)">0</span>
+        <label>🥈 Silver</label>
+      </div>
+      <div class="stat-pill">
+        <span id="st-bronze" style="color:var(--bronze)">0</span>
+        <label>🥉 Bronze</label>
+      </div>
+      <div class="stat-pill">
+        <span id="st-none" style="color:var(--muted)">0</span>
+        <label>No Ticket</label>
+      </div>
+    </div>
+
+    <!-- Toolbar -->
+    <div class="toolbar" id="toolbar" style="display:none">
+      <input class="search-box" type="text" id="searchBox" placeholder="Search by name or email…" oninput="renderTable()">
+      <select class="filter-sel" id="filterTicket" onchange="renderTable()">
+        <option value="">All tickets</option>
+        <option value="gold">🥇 Gold only</option>
+        <option value="silver">🥈 Silver only</option>
+        <option value="bronze">🥉 Bronze only</option>
+        <option value="none">No ticket</option>
+      </select>
+      <div class="save-banner" id="saveBanner">✅ Saved!</div>
+    </div>
+
+    <!-- Table -->
+    <div id="tableArea"></div>
+  </div>
+</div>
+
+<script>
+const API_BASE = window.API_BASE || 'https://web-production-db5e1.up.railway.app';
+let adminKey = '';
+let allStudents = [];
+let currentCohort = '';
+
+async function login() {
+  const key = document.getElementById('keyInput').value.trim();
+  if (!key) return;
+  try {
+    const r = await fetch(`${API_BASE}/api/admin/cohorts`, { headers:{'X-Admin-Key':key} });
+    if (!r.ok) return showStatus('authStatus','err','Wrong key. Try again.');
+    adminKey = key;
+    document.getElementById('authGate').style.display  = 'none';
+    document.getElementById('mainPanel').style.display = 'block';
+    await loadCohortList();
+  } catch { showStatus('authStatus','err','Cannot reach backend.'); }
+}
+
+async function loadCohortList() {
+  const r    = await fetch(`${API_BASE}/api/admin/cohorts`, { headers:{'X-Admin-Key':adminKey} });
+  const data = await r.json();
+  const sel  = document.getElementById('cohortSel');
+  sel.innerHTML = '<option value="">— choose a cohort —</option>';
+  (data.cohorts || []).filter(c=>c.active!==false).forEach(c => {
+    sel.innerHTML += `<option value="${c.id}">${c.emoji} ${c.name}${c.week?' · '+c.week:''}</option>`;
+  });
+}
+
+async function loadCohort(id) {
+  if (!id) return;
+  currentCohort = id;
+  document.getElementById('tableArea').innerHTML = `<div class="loader"><div class="spinner"></div><p style="color:var(--muted);font-size:13px">Loading students…</p></div>`;
+  document.getElementById('statsStrip').style.display = 'none';
+  document.getElementById('toolbar').style.display    = 'none';
+
+  const r    = await fetch(`${API_BASE}/api/admin/cohorts/${id}/students`, { headers:{'X-Admin-Key':adminKey} });
+  const data = await r.json();
+  allStudents = data.students || [];
+  document.getElementById('statsStrip').style.display = 'flex';
+  document.getElementById('toolbar').style.display    = 'flex';
+  updateStats();
+  renderTable();
+}
+
+function updateStats() {
+  document.getElementById('st-total').textContent  = allStudents.length;
+  document.getElementById('st-gold').textContent   = allStudents.filter(s=>s.ticket==='gold').length;
+  document.getElementById('st-silver').textContent = allStudents.filter(s=>s.ticket==='silver').length;
+  document.getElementById('st-bronze').textContent = allStudents.filter(s=>s.ticket==='bronze').length;
+  document.getElementById('st-none').textContent   = allStudents.filter(s=>!s.ticket).length;
+}
+
+function renderTable() {
+  const q      = document.getElementById('searchBox').value.toLowerCase();
+  const filter = document.getElementById('filterTicket').value;
+
+  let list = allStudents.filter(s => {
+    const matchQ = !q || s.name.toLowerCase().includes(q) || s.email.toLowerCase().includes(q);
+    const matchT = !filter ? true :
+                   filter === 'none' ? !s.ticket :
+                   s.ticket === filter;
+    return matchQ && matchT;
+  });
+
+  if (!list.length) {
+    document.getElementById('tableArea').innerHTML = `
+      <div class="table-wrap"><table class="tbl">
+        <tr class="empty-row"><td colspan="8">No students match your search</td></tr>
+      </table></div>`;
+    return;
+  }
+
+  const rows = list.map(s => {
+    const rc = s.rank<=3?`r${s.rank}`:'';
+    const tc = s.ticket || '';
+    return `<tr data-email="${s.email}">
+      <td><div class="rank-badge ${rc}">${s.rank}</div></td>
+      <td>
+        <div class="sname">${s.name}</div>
+        <div class="semail">${s.email}</div>
+      </td>
+      <td><span class="stat-val" style="color:#c77dff">${s.vibe.toFixed(0)}%</span></td>
+      <td><span class="stat-val" style="color:#6bcb77">${s.cs.toFixed(0)}%</span></td>
+      <td><span class="stat-val" style="color:#ff9f43">${s.hp.toFixed(0)}</span></td>
+      <td><span class="stat-val" style="color:#ffd93d">${s.att}</span></td>
+      <td>
+        <select class="ticket-sel ${tc}" onchange="onTicketChange(this,'${s.email}')">
+          <option value="" ${!tc?'selected':''}>— none —</option>
+          <option value="gold"   ${tc==='gold'  ?'selected':''}>🥇 Gold</option>
+          <option value="silver" ${tc==='silver'?'selected':''}>🥈 Silver</option>
+          <option value="bronze" ${tc==='bronze'?'selected':''}>🥉 Bronze</option>
+        </select>
+      </td>
+      <td style="display:flex;align-items:center;gap:8px">
+        <input class="msg-input" type="text" placeholder="Personal message…"
+          value="${escapeAttr(s.message||'')}"
+          id="msg-${s.email.replace(/[@.]/g,'-')}"
+        >
+        <button class="save-btn" onclick="saveMessage('${s.email}')">Save</button>
+      </td>
+    </tr>`;
+  }).join('');
+
+  document.getElementById('tableArea').innerHTML = `
+    <div class="table-wrap">
+      <table class="tbl">
+        <thead>
+          <tr>
+            <th>#</th>
+            <th>Student</th>
+            <th>⚡ Vibe</th>
+            <th>📚 CS</th>
+            <th>❤️ HP</th>
+            <th>📅 Att</th>
+            <th>🎫 Ticket</th>
+            <th>💬 Message</th>
+          </tr>
+        </thead>
+        <tbody>${rows}</tbody>
+      </table>
+    </div>`;
+}
+
+async function onTicketChange(sel, email) {
+  const ticket = sel.value;
+  sel.className = `ticket-sel ${ticket}`;
+
+  // update local state
+  const s = allStudents.find(x => x.email === email);
+  if (s) s.ticket = ticket;
+  updateStats();
+
+  await fetch(`${API_BASE}/api/admin/cohorts/${currentCohort}/tickets`, {
+    method: 'PATCH',
+    headers: {'Content-Type':'application/json','X-Admin-Key':adminKey},
+    body: JSON.stringify({email, ticket}),
+  });
+  flashSaved();
+}
+
+async function saveMessage(email) {
+  const inputId = 'msg-' + email.replace(/[@.]/g,'-');
+  const el  = document.getElementById(inputId);
+  const msg = (el?.value || '').trim();
+
+  // update local state
+  const s = allStudents.find(x => x.email === email);
+  if (s) s.message = msg;
+
+  await fetch(`${API_BASE}/api/admin/cohorts/${currentCohort}/messages`, {
+    method: 'PATCH',
+    headers: {'Content-Type':'application/json','X-Admin-Key':adminKey},
+    body: JSON.stringify({email, message: msg}),
+  });
+
+  // flash the button
+  const btn = el?.nextElementSibling;
+  if (btn) { btn.textContent='✓ Saved'; btn.classList.add('saved'); setTimeout(()=>{ btn.textContent='Save'; btn.classList.remove('saved'); },2000); }
+}
+
+function flashSaved() {
+  const b = document.getElementById('saveBanner');
+  b.style.display = 'block';
+  clearTimeout(b._t);
+  b._t = setTimeout(()=>{ b.style.display='none'; }, 2000);
+}
+
+function showStatus(id, type, msg) {
+  const el = document.getElementById(id);
+  el.className = `status ${type}`;
+  el.textContent = msg;
+}
+
+function escapeAttr(s) {
+  return s.replace(/"/g,'&quot;').replace(/'/g,'&#39;');
+}
+</script>
+</body>
+</html>

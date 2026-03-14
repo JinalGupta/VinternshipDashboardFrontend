@@ -309,6 +309,8 @@ header {
   <div class="hright">
     <span class="badge" id="updateBadge">Loading…</span>
     <span class="badge live" id="countBadge" style="display:none"></span>
+    <a href="tickets.html"><button class="btn-admin" style="background:linear-gradient(135deg,#ffd700,#ff9500);color:#000">🎫 Tickets</button></a>
+    <a href="student.html"><button class="btn-admin" style="background:linear-gradient(135deg,#6bcb77,#4d96ff);color:#000">🎓 Student View</button></a>
     <button class="btn-admin" onclick="openAdmin()">⚙️ Manage Cohorts</button>
   </div>
 </header>
@@ -594,7 +596,9 @@ function renderOverview() {
   if (!cohorts.length) return `<div class="empty">
     <div class="empty-icon">📭</div>
     <div class="empty-title">No cohorts yet</div>
-    <div class="empty-text">Click <strong>⚙️ Manage Cohorts</strong> above to add your first cohort.</div>
+    <a href="tickets.html"><button class="btn-admin" style="background:linear-gradient(135deg,#ffd700,#ff9500);color:#000">🎫 Tickets</button></a>
+    <a href="student.html"><button class="btn-admin" style="background:linear-gradient(135deg,#6bcb77,#4d96ff);color:#000">🎓 Student View</button></a>
+    <button class="btn-admin" onclick="openAdmin()">⚙️ Manage Cohorts</button>
   </div>`;
 
   const total  = cohorts.reduce((s,c)=>s+(c.total||0),0);
